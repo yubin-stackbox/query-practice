@@ -11,7 +11,7 @@ Analyze an organizational hierarchy to generate a summary for each employee, inc
 Results are returned as a table ordered by level (asc), budget (desc), and employee name (asc).
 
 Approach:
-1. Determine the organisational level with RECURSIVE CTE
+1. Determine the organisational level with RECURSIVE CTE (hierarchy)
 - Anchor: CEO whoes manager_id is NULL has level as 1
 - Recursive query: add 1 to their manager's level
 2. 
@@ -26,10 +26,21 @@ Notes / Pitfalls: RECURSIVE CTE
 */
 
 WITH RECURSIVE hierarchy AS (
-    SELECT employee_id, manager_id, 1 AS level
+    SELECT employee_id, employee_name, manager_id, salary, 1 AS level
     FROM Employees
     WHERE manager_id IS NULL
     UNION ALL
-    SELECT e.employee_id, e.manager_id, c.level + 1
-    FROM Employees e JOIN hierarchy h ON e.manager_id = c.employee_id
+    SELECT e.employee_id, e.employee_name, e.manager_id, e.salary, h.level + 1
+    FROM Employees e JOIN hierarchy h ON e.manager_id = h.employee_id
 )
+, team AS(
+    SELECT e1.employee_id, e1.manager_id, e2.employee_id AS colleague, e2.salary AS colleague_salary
+    FROM Employees e1 JOIN Employees e2 ON e1.employee_id = e2.manager_id
+    UNION ALL
+    SELECT t.employee_id, t.manager_id, e.employee_id, e.salary
+    FROM Employees e JOIN team t ON t.colleague = e.manager_id 
+)
+SELECT h.employee_id, h.employee_name, level, COUNT(colleague) AS team_size, (SUM(IFNULL(colleague_salary,0)) + h.salary)AS budget
+FROM hierarchy h LEFT JOIN team t USING(employee_id)
+GROUP BY h.employee_id
+ORDER BY level, budget DESC, employee_name
