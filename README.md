@@ -1,5 +1,5 @@
 # Query Practice Solutions
-This repository contains solutions to SQL query challenges from platforms such as **LeetCode** and **StrataScratch** (with more to come in the future). The focus is not only on solving the problems but also on writing **optimized, readable, and maintainable code**.  
+This repository contains solutions to SQL query challenges from platforms such as **LeetCode** and **StrataScratch** (with more to come in the future). The focus is not only on solving the problems but also on writing **optimised, readable, and maintainable code**.  
 <br>
 
 ## ✨ Highlights  
